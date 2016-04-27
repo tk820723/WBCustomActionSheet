@@ -15,6 +15,7 @@
 		264208AF1CD06F9600321AF2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 264208AD1CD06F9600321AF2 /* LaunchScreen.storyboard */; };
 		264208BA1CD06F9600321AF2 /* WBCustomActionSheetTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 264208B91CD06F9600321AF2 /* WBCustomActionSheetTests.m */; };
 		264208C51CD06F9600321AF2 /* WBCustomActionSheetUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 264208C41CD06F9600321AF2 /* WBCustomActionSheetUITests.m */; };
+		264208D41CD06FA700321AF2 /* WBCustomActionSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 264208D31CD06FA700321AF2 /* WBCustomActionSheet.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,8 @@
 		264208C01CD06F9600321AF2 /* WBCustomActionSheetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WBCustomActionSheetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		264208C41CD06F9600321AF2 /* WBCustomActionSheetUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WBCustomActionSheetUITests.m; sourceTree = "<group>"; };
 		264208C61CD06F9600321AF2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		264208D21CD06FA700321AF2 /* WBCustomActionSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBCustomActionSheet.h; sourceTree = "<group>"; };
+		264208D31CD06FA700321AF2 /* WBCustomActionSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WBCustomActionSheet.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +104,8 @@
 		2642089E1CD06F9600321AF2 /* WBCustomActionSheet */ = {
 			isa = PBXGroup;
 			children = (
+				264208D21CD06FA700321AF2 /* WBCustomActionSheet.h */,
+				264208D31CD06FA700321AF2 /* WBCustomActionSheet.m */,
 				264208A21CD06F9600321AF2 /* AppDelegate.h */,
 				264208A31CD06F9600321AF2 /* AppDelegate.m */,
 				264208A51CD06F9600321AF2 /* ViewController.h */,
@@ -273,6 +278,7 @@
 				264208A71CD06F9600321AF2 /* ViewController.m in Sources */,
 				264208A41CD06F9600321AF2 /* AppDelegate.m in Sources */,
 				264208A11CD06F9600321AF2 /* main.m in Sources */,
+				264208D41CD06FA700321AF2 /* WBCustomActionSheet.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
