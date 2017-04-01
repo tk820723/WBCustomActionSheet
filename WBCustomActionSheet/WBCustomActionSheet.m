@@ -10,26 +10,34 @@
 
 @interface WBCustomActionSheet ()
 
-@property (nonatomic,strong)NSMutableArray *buttons;
-@property (nonatomic,strong)UIButton *cancelButton;
+@property (nonatomic,strong) NSMutableArray *buttons;
+@property (nonatomic,strong) UIButton *cancelButton;
 
-@property (nonatomic,strong)UIView *contentView;
+@property (nonatomic,strong) UIView *contentView;
+@property (nonatomic,strong) UIView *upperPanel;
+@property (nonatomic,strong) UIView *lowerPanel;
 
-@property (nonatomic,assign)NSInteger numberOfActions;
-@property (nonatomic,assign)CGFloat heightForTitle;
-@property (nonatomic,assign)CGFloat heightForButton;
-@property (nonatomic,assign)CGFloat marginForButton;
+@property (nonatomic,assign) NSInteger numberOfActions;
+@property (nonatomic,strong) WBActionSheetConfig *config;
 
-@property (nonatomic,assign)BOOL isShownByWindow;
+@property (nonatomic,assign) BOOL isShownByWindow;
 
 @end
 
 @implementation WBCustomActionSheet
 
-+ (instancetype)customActionSheetWithTitle: (NSString *)title delegate:(id)delegate{
++ (instancetype)customActionSheetWithConfig:(WBActionSheetConfig *)config delegate:(id <WBCustomActionSheetDataSourceAngDelegate>)delegate {
     WBCustomActionSheet *actionSheet = [[WBCustomActionSheet alloc] init];
-    actionSheet.title = title;
+    
+    if (config) {
+        actionSheet.config = config;
+    }else{
+        actionSheet.config = [[WBActionSheetConfig alloc] init];
+    }
+    
     actionSheet.delegate = delegate;
+    
+    [actionSheet prepareToPresent];
     
     return actionSheet;
 }
@@ -37,24 +45,6 @@
 - (instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
         self.frame = [UIScreen mainScreen].bounds;
-        //默认值
-        self.heightForTitle = 44;
-        self.heightForButton = 36;
-        self.marginForButton = 8;
-        self.isPresenting = NO;
-        self.isShownByWindow = NO;
-        self.contentBackgroundColor = [UIColor whiteColor];
-        self.isNeedShadow = YES;
-        
-        self.contentView = [[UIView alloc] init];
-        self.contentView.backgroundColor = self.contentBackgroundColor;
-        self.buttons = [NSMutableArray array];
-        [self addSubview:self.contentView];
-        
-        self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.heightForTitle)];
-        [self.titleLabel setTextColor:[UIColor grayColor]];
-        [self.titleLabel setTextAlignment:NSTextAlignmentCenter];
-        [self.contentView addSubview:self.titleLabel];
     }
     return self;
     
@@ -67,33 +57,13 @@
     
     if ([self.delegate respondsToSelector:@selector(numberOfActionsInCustomActionSheet:)]) {
         self.numberOfActions = [self.delegate numberOfActionsInCustomActionSheet: self];
+    }else{
+        self.numberOfActions = 0;
     }
-    
-    if ([self.delegate respondsToSelector:@selector(customActionSheetHeightForTitle:)]) {
-        self.heightForTitle = [self.delegate customActionSheetHeightForTitle: self];
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(customActionSheetHeightForButton:)]) {
-        self.heightForButton = [self.delegate customActionSheetHeightForButton: self];
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(customActionSheetMarginForButtons:)]) {
-        self.marginForButton = [self.delegate customActionSheetMarginForButtons: self];
-    }
-    
-    [self prepareToPresent];
 }
 
 - (void)reload{
     self.delegate = _delegate;
-}
-
-- (void)setContentBackgroundColor:(UIColor *)contentBackgroundColor{
-    if (_contentBackgroundColor != contentBackgroundColor) {
-        _contentBackgroundColor = contentBackgroundColor;
-        self.contentView.backgroundColor = contentBackgroundColor;
-    }
-    
 }
 
 - (void)showAnimated:(BOOL)animated{
@@ -106,7 +76,7 @@
 
             self.backgroundColor = [UIColor clearColor];
             [UIView animateWithDuration:0.3 animations:^{
-                if (self.isNeedShadow) {
+                if (self.config.isNeedShadow) {
                     self.backgroundColor = [UIColor colorWithRed:0.6 green:0.6 blue:0.6 alpha:0.4];
                 }
                 self.contentView.frame = CGRectMake(0, self.frame.size.height - [self heightForContent], self.frame.size.width, [self heightForContent]);
@@ -114,7 +84,7 @@
                 
             }];
         }else{
-            if (self.isNeedShadow) {
+            if (self.config.isNeedShadow) {
                 self.backgroundColor = [UIColor colorWithRed:0.6 green:0.6 blue:0.6 alpha:0.4];
             }else{
                 self.backgroundColor = [UIColor clearColor];
@@ -122,9 +92,6 @@
             self.contentView.frame = CGRectMake(0, self.frame.size.height - [self heightForContent], self.frame.size.width, [self heightForContent]);
         }
     }
-    
-    
-    
 }
 //初始化所有控件
 - (void)prepareToPresent{
@@ -135,50 +102,89 @@
         }
         [self.buttons removeAllObjects];
     }
+    
+    [self.upperPanel removeFromSuperview];
+    self.upperPanel = nil;
+    
     if (self.cancelButton) {
         [self.cancelButton removeFromSuperview];
         self.cancelButton = nil;
     }
     
-    if (self.isNeedShadow) {
+    [self.lowerPanel removeFromSuperview];
+    self.lowerPanel = nil;
+    
+    if (self.config.isNeedShadow) {
         self.backgroundColor = [UIColor colorWithRed:0.6 green:0.6 blue:0.6 alpha:0.4];
     }else{
         self.backgroundColor = [UIColor clearColor];
     }
     
+    CGFloat heightForContent = [self heightForContent];
+    
+    self.contentView = [[UIView alloc] initWithFrame:CGRectMake(0, self.frame.size.height - heightForContent, self.frame.size.width, heightForContent)];
+    [self addSubview:self.contentView];
+    
+    self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.config.titleHeight)];
+    [self.titleLabel setTextColor:self.config.titleColor];
+    self.titleLabel.font = self.config.titleFont;
+    self.titleLabel.text = self.config.titleString;
+    self.titleLabel.userInteractionEnabled = NO;
+    [self.titleLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.contentView addSubview:self.titleLabel];
+    
     self.frame = [UIScreen mainScreen].bounds;
-    self.titleLabel.frame = CGRectMake(0, 0, self.frame.size.width, self.heightForTitle);
+    self.titleLabel.frame = CGRectMake(0, 0, self.frame.size.width, self.config.titleHeight);
     self.contentView.frame = CGRectMake(0, self.frame.size.height, self.frame.size.width, [self heightForContent]);
-    [self.titleLabel setText:self.title];
+    
+    self.upperPanel = [[UIView alloc] initWithFrame:CGRectMake(self.config.buttonMargin, self.config.titleHeight + self.config.buttonMargin, self.frame.size.width - 2 * self.config.buttonMargin, self.config.buttonHeight * self.numberOfActions)];
+    self.upperPanel.backgroundColor = self.config.upperPanelBackgroundColor;
+    [self.contentView addSubview:self.upperPanel];
+    self.upperPanel.layer.cornerRadius = self.config.cornerRadius;
+    self.upperPanel.clipsToBounds = YES;
+    
+    self.lowerPanel = [[UIView alloc] initWithFrame:CGRectMake(self.config.buttonMargin, CGRectGetMaxY(self.upperPanel.frame) + self.config.buttonMargin, self.upperPanel.bounds.size.width, self.config.buttonHeight)];
+    self.lowerPanel.backgroundColor = self.config.lowerPanelBackgroundColor;
+    self.lowerPanel.layer.cornerRadius = self.config.cornerRadius;
+    self.lowerPanel.clipsToBounds = YES;
+    [self.contentView addSubview:self.lowerPanel];
+
     
     for (int i = 0; i < self.numberOfActions; i++) {
         if ([self.delegate respondsToSelector:@selector(buttonForIndex:InCustomActionSheet:)]) {
             UIButton *button = [self.delegate buttonForIndex:i InCustomActionSheet:self];
             [button addTarget:self action:@selector(userDidClickButton:) forControlEvents:UIControlEventTouchUpInside];
-            button.frame = CGRectMake(self.marginForButton, self.heightForTitle + i * (self.heightForButton+self.marginForButton), self.frame.size.width - 2 * self.marginForButton, self.heightForButton);
+            button.frame = CGRectMake(0, i * self.config.buttonHeight, self.upperPanel.frame.size.width, self.config.buttonHeight);
             [self.buttons addObject:button];
-            [self.contentView addSubview:button];
+            [self.upperPanel addSubview:button];
+            
+            if (self.config.isNeedSeperator && i != self.numberOfActions -1) {
+                UIView *seperator = [[UIView alloc] initWithFrame: CGRectMake(self.config.seperatorMargin, CGRectGetMaxY(button.frame)-1, button.bounds.size.width - 2 * self.config.seperatorMargin, self.config.seperatorHeight)];
+                seperator.backgroundColor = self.config.seperatorColor;
+                [self.upperPanel addSubview:seperator];
+            }
         }else{
             UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
             [button addTarget:self action:@selector(userDidClickButton:) forControlEvents:UIControlEventTouchUpInside];
-            button.frame = CGRectMake(self.marginForButton, self.heightForTitle + i * (self.heightForButton+self.marginForButton), self.frame.size.width - 2 * self.marginForButton, self.heightForButton);
+            button.frame = CGRectMake(0, i * self.config.buttonHeight, self.upperPanel.frame.size.width, self.config.buttonHeight);
             [self.buttons addObject:button];
-            [self.contentView addSubview:button];
+            [self.upperPanel addSubview:button];
+            
         }
+
     }
     if ([self.delegate respondsToSelector:@selector(cancelButtonInCustomActionSheet:)]) {
         UIButton *button = [self.delegate cancelButtonInCustomActionSheet: self];
         [button addTarget:self action:@selector(userDidClickCancelButton:) forControlEvents:UIControlEventTouchUpInside];
-        button.frame = CGRectMake(self.marginForButton, self.heightForTitle + self.buttons.count * (self.heightForButton+self.marginForButton), self.frame.size.width - 2*self.marginForButton, self.heightForButton);
-        [self.contentView addSubview:button];
+        button.frame = CGRectMake(0, 0, self.lowerPanel.frame.size.width, self.config.buttonHeight);
+        [self.lowerPanel addSubview:button];
         self.cancelButton = button;
     }else{
         UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
         [btn setBackgroundColor:[UIColor blackColor]];
-        [btn setTitle:@"取消" forState:UIControlStateNormal];
         [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [btn addTarget:self action:@selector(userDidClickCancelButton:) forControlEvents:UIControlEventTouchUpInside];
-        btn.frame = CGRectMake(self.marginForButton, self.heightForTitle + self.buttons.count * (self.heightForButton+self.marginForButton), self.frame.size.width - 2*self.marginForButton, self.heightForButton);
+        btn.frame = CGRectMake(0, 0, self.lowerPanel.frame.size.width, self.config.buttonHeight);
         [self.contentView addSubview:btn];
         self.cancelButton = btn;
     }
@@ -188,14 +194,15 @@
 - (CGFloat)heightForContent{
     CGFloat totalHeight = 0;
     //title高度
-    totalHeight += self.heightForTitle;
+    totalHeight += self.config.titleHeight;
+    totalHeight += self.config.buttonMargin;
     //按钮高度
     for (int i = 0; i<self.numberOfActions; i++) {
-        totalHeight += self.heightForButton;
-        totalHeight += self.marginForButton;
+        totalHeight += self.config.buttonHeight;
     }
+    totalHeight += self.config.buttonMargin;
     //取消按钮高度
-    totalHeight += self.heightForButton + self.marginForButton;
+    totalHeight += self.config.buttonHeight + self.config.lowerMargin;
     
     return totalHeight;
 }
@@ -206,7 +213,7 @@
         if (self.isShownByWindow) { //window显示出来的
             if (animated) {
                 [UIView animateWithDuration:0.3 animations:^{
-                    if (self.isNeedShadow) {
+                    if (self.config.isNeedShadow) {
                         self.backgroundColor = [UIColor clearColor];
                     }
                     self.contentView.frame = CGRectMake(0, self.frame.size.height, self.frame.size.width, [self heightForContent]);
@@ -253,6 +260,36 @@
     if (!CGRectContainsPoint(self.contentView.frame, point)) {
         [self userDidClickCancelButton:[self.delegate cancelButtonInCustomActionSheet:self]];
     }
+}
+
+@end
+
+@implementation WBActionSheetConfig
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.titleHeight = 44;
+        self.buttonHeight = 36;
+        self.buttonMargin = 8;
+        self.isNeedShadow = YES;
+        self.isNeedBlurEffect = YES;
+        self.titleColor = [UIColor whiteColor];
+        self.titleString = @"标题";
+        self.isNeedSeperator = YES;
+        self.seperatorColor =  [UIColor colorWithRed:224/255.0 green:224/255.0 blue:224/255.0 alpha:1.0];
+        self.seperatorHeight = 1;
+        self.seperatorMargin = 16;
+        
+        self.upperPanelBackgroundColor = [UIColor whiteColor];
+        self.lowerPanelBackgroundColor = [UIColor whiteColor];
+        
+        self.cornerRadius = 8;
+        
+        self.lowerMargin = 16;
+    }
+    return self;
 }
 
 @end

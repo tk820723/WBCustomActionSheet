@@ -7,22 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
-@class WBCustomActionSheet;
+@class WBCustomActionSheet, WBActionSheetConfig;
 @protocol WBCustomActionSheetDataSourceAngDelegate <NSObject>
-@required
+@required  //-->DataSource
 //多少个action
 - (NSInteger)numberOfActionsInCustomActionSheet: (WBCustomActionSheet *)actionSheet;
 //每个button的样式
 - (UIButton *)buttonForIndex: (NSInteger)index InCustomActionSheet: (WBCustomActionSheet *)actionSheet;
 
-
-@optional
-//返回title的高度 默认44
-- (CGFloat)customActionSheetHeightForTitle: (WBCustomActionSheet *)actionSheet ;
-//返回每个button的高度 默认36
-- (CGFloat)customActionSheetHeightForButton: (WBCustomActionSheet *)actionSheet;
-//Button间隔  默认8
-- (CGFloat)customActionSheetMarginForButtons: (WBCustomActionSheet *)actionSheet;
+@optional   //-->Delegate
 //用户点击事件
 - (void)customActionSheetUserDidClickButtonAtIndex: (NSInteger)index;
 //用户点击取消
@@ -35,16 +28,51 @@
 @property (nonatomic,strong)UILabel *titleLabel;
 @property (nonatomic,assign)id <WBCustomActionSheetDataSourceAngDelegate> delegate;
 @property (nonatomic,assign)BOOL isPresenting;
-@property (nonatomic,copy)NSString *title;
-@property (nonatomic,strong)UIColor *contentBackgroundColor;
-@property (nonatomic,assign)BOOL isNeedShadow;
 
-+ (instancetype)customActionSheetWithTitle: (NSString *)title delegate:(id)delegate;
++ (instancetype)customActionSheetWithConfig:(WBActionSheetConfig *)config delegate:(id <WBCustomActionSheetDataSourceAngDelegate>)delegate;
 
+/**
+ 重载actionsheet
+ */
 - (void)reload;
 
-- (void)showAnimated: (BOOL)animated;
+/**
+ 显示actionsheet
 
+ @param animated 是否需要动画效果
+ */
+- (void)showAnimated: (BOOL)animated;
+/**
+ actionsheet消失
+ 
+ @param animated 是否需要动画效果
+ */
 - (void)dismissAnimated: (BOOL)animated;
+
+@end
+
+@interface WBActionSheetConfig : NSObject
+
+@property (nonatomic,strong) NSString *titleString;
+
+@property (nonatomic,assign) CGFloat titleHeight;
+@property (nonatomic,strong) UIFont *titleFont;
+@property (nonatomic,strong) UIColor *titleColor;
+
+@property (nonatomic,assign) CGFloat cornerRadius;
+
+@property (nonatomic,strong) UIColor *upperPanelBackgroundColor;
+@property (nonatomic,strong) UIColor *lowerPanelBackgroundColor;
+
+@property (nonatomic,assign) BOOL isNeedSeperator;
+@property (nonatomic,assign) CGFloat seperatorMargin;
+@property (nonatomic,strong) UIColor *seperatorColor;
+@property (nonatomic,assign) CGFloat seperatorHeight;
+
+@property (nonatomic,assign) CGFloat buttonHeight;
+@property (nonatomic,assign) CGFloat buttonMargin;
+@property (nonatomic,assign) CGFloat lowerMargin;
+@property (nonatomic,assign) BOOL isNeedBlurEffect;
+@property (nonatomic,assign) BOOL isNeedShadow;
 
 @end

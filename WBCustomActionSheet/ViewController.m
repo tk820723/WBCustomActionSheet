@@ -18,7 +18,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-     self.actionSheet = [WBCustomActionSheet customActionSheetWithTitle:@"标题文字" delegate:self];
+    WBActionSheetConfig *config = [[WBActionSheetConfig alloc] init];
+    config.titleString = @"";
+
+//    config.buttonHeight = [UIFont systemFontOfSize:12];
+     self.actionSheet = [WBCustomActionSheet customActionSheetWithConfig:config delegate:self];
+    
     
     UIButton *btn =[UIButton buttonWithType:UIButtonTypeSystem];
     btn.frame = CGRectMake(100, 100, 100, 100);
@@ -55,22 +60,20 @@
         buttonTitle = @"第5个action";
     }
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [button setBackgroundColor:[UIColor whiteColor]];
-    button.layer.cornerRadius = 8;
-    button.layer.borderColor = [UIColor blackColor].CGColor;
-    button.layer.borderWidth = 1;
+    [button setTitleColor:[UIColor colorWithRed:74.0/255.0 green:74.0/255.0 blue:74.0/255.0 alpha:1.0] forState:UIControlStateNormal];
+    [button setBackgroundColor:[UIColor clearColor]];
+//    button.layer.cornerRadius = 8;
+//    button.layer.borderColor = [UIColor blackColor].CGColor;
+//    button.layer.borderWidth = 1;
     [button setTitle:buttonTitle forState:UIControlStateNormal];
     return button;
 }
 
 - (UIButton *)cancelButtonInCustomActionSheet:(WBCustomActionSheet *)actionSheet{
-    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [btn setBackgroundColor:[UIColor blackColor]];
-    btn.layer.cornerRadius = 8;
-    [btn setTitle:@"取消" forState:UIControlStateNormal];
-    [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    return btn;
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setTitle:@"取消" forState:UIControlStateNormal];
+    [button setTitleColor:[UIColor colorWithRed:74.0/255.0 green:74.0/255.0 blue:74.0/255.0 alpha:1.0] forState:UIControlStateNormal];
+    return button;
 }
 #pragma mark - CustomActionSheetDelegate
 - (void)customActionSheetUserDidClickCancelButton{
@@ -91,5 +94,8 @@
     }
 }
 
+- (CGFloat)customActionSheetMarginForButtons:(WBCustomActionSheet *)actionSheet{
+    return 0;
+}
 
 @end
