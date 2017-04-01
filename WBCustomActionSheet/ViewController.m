@@ -94,8 +94,5 @@
     }
 }
 
-- (CGFloat)customActionSheetMarginForButtons:(WBCustomActionSheet *)actionSheet{
-    return 0;
-}
 
 @end

@@ -26,7 +26,7 @@
 
 @implementation WBCustomActionSheet
 
-+ (instancetype)customActionSheetWithConfig:(WBActionSheetConfig *)config delegate:(id <WBCustomActionSheetDataSourceAngDelegate>)delegate {
++ (instancetype)customActionSheetWithConfig:(WBActionSheetConfig *)config{
     WBCustomActionSheet *actionSheet = [[WBCustomActionSheet alloc] init];
     
     if (config) {
@@ -34,10 +34,6 @@
     }else{
         actionSheet.config = [[WBActionSheetConfig alloc] init];
     }
-    
-    actionSheet.delegate = delegate;
-    
-    [actionSheet prepareToPresent];
     
     return actionSheet;
 }
@@ -60,6 +56,7 @@
     }else{
         self.numberOfActions = 0;
     }
+    [self prepareToPresent];
 }
 
 - (void)reload{
@@ -235,17 +232,17 @@
 }
 
 - (void)userDidClickButton: (UIButton *)button{
-    if ([self.delegate respondsToSelector:@selector(customActionSheetUserDidClickButtonAtIndex:)]) {
+    if ([self.delegate respondsToSelector:@selector(customActionSheet:userDidClickButtonAtIndex:)]) {
         if ([self.buttons containsObject:button]) {
             NSInteger index = [self.buttons indexOfObject:button];
-            [self.delegate customActionSheetUserDidClickButtonAtIndex:index];
+            [self.delegate customActionSheet:self userDidClickButtonAtIndex:index];
         }
     }
 }
 
 - (void)userDidClickCancelButton: (UIButton *)button{
-    if ([self.delegate respondsToSelector:@selector(customActionSheetUserDidClickCancelButton)]) {
-        [self.delegate customActionSheetUserDidClickCancelButton];
+    if ([self.delegate respondsToSelector:@selector(customActionSheet:userDidClickCancelButton:)]) {
+        [self.delegate customActionSheet:self userDidClickCancelButton:button];
     }else{
         [self dismissAnimated:YES];
     }

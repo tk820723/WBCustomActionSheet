@@ -17,9 +17,9 @@
 
 @optional   //-->Delegate
 //用户点击事件
-- (void)customActionSheetUserDidClickButtonAtIndex: (NSInteger)index;
+- (void)customActionSheet: (WBCustomActionSheet *)sheet userDidClickButtonAtIndex: (NSInteger)index;
 //用户点击取消
-- (void)customActionSheetUserDidClickCancelButton;
+- (void)customActionSheet: (WBCustomActionSheet *)sheet userDidClickCancelButton: (UIButton *)cancelBtn;
 //取消按钮样式
 - (UIButton *)cancelButtonInCustomActionSheet: (WBCustomActionSheet *)actionSheet;
 @end
@@ -29,7 +29,7 @@
 @property (nonatomic,assign)id <WBCustomActionSheetDataSourceAngDelegate> delegate;
 @property (nonatomic,assign)BOOL isPresenting;
 
-+ (instancetype)customActionSheetWithConfig:(WBActionSheetConfig *)config delegate:(id <WBCustomActionSheetDataSourceAngDelegate>)delegate;
++ (instancetype)customActionSheetWithConfig:(WBActionSheetConfig *)config;
 
 /**
  重载actionsheet
