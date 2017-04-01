@@ -38,6 +38,13 @@
     return actionSheet;
 }
 
+- (NSMutableArray *)buttons{
+    if (!_buttons) {
+        _buttons = [NSMutableArray array];
+    }
+    return _buttons;
+}
+
 - (instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
         self.frame = [UIScreen mainScreen].bounds;
